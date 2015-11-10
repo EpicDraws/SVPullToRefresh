@@ -21,7 +21,6 @@ static CGFloat const SVPullToRefreshViewHeight = 60;
 
 @end
 
-
 @interface SVPullToRefreshView ()
 
 @property (nonatomic, copy) void (^pullToRefreshActionHandler)(void);
@@ -50,8 +49,6 @@ static CGFloat const SVPullToRefreshViewHeight = 60;
 - (void)rotateArrow:(float)degrees hide:(BOOL)hide;
 
 @end
-
-
 
 #pragma mark - UIScrollView (SVPullToRefresh)
 #import <objc/runtime.h>
@@ -272,14 +269,27 @@ static char UIScrollViewPullToRefreshView;
 
 - (void)scrollViewDidScroll:(CGPoint)contentOffset {
     if(self.state != SVPullToRefreshStateLoading) {
+        id customView = [self.viewForState objectAtIndex:self.state];
+        BOOL hasCustomView = [customView isKindOfClass:[UIView class]];
+        
         CGFloat scrollOffsetThreshold = self.frame.origin.y-self.originalTopInset - 64;
         
-        if(!self.scrollView.isDragging && self.state == SVPullToRefreshStateTriggered)
+        if(!self.scrollView.isDragging && self.state == SVPullToRefreshStateTriggered) {
             self.state = SVPullToRefreshStateLoading;
-        else if(contentOffset.y < scrollOffsetThreshold && self.scrollView.isDragging && self.state == SVPullToRefreshStateStopped)
+            if(hasCustomView && [customView respondsToSelector:@selector(refreshStateUpdated:)]) {
+                [customView performSelector:@selector(refreshStateUpdated:) withObject:[NSNumber numberWithInt:self.state]];
+            }
+        } else if(contentOffset.y < scrollOffsetThreshold && self.scrollView.isDragging && self.state == SVPullToRefreshStateStopped) {
             self.state = SVPullToRefreshStateTriggered;
-        else if(contentOffset.y >= scrollOffsetThreshold && self.state != SVPullToRefreshStateStopped)
+            if(hasCustomView && [customView respondsToSelector:@selector(refreshStateUpdated:)]) {
+                [customView performSelector:@selector(refreshStateUpdated:) withObject:[NSNumber numberWithInt:self.state]];
+            }
+        } else if(contentOffset.y >= scrollOffsetThreshold && self.state != SVPullToRefreshStateStopped) {
             self.state = SVPullToRefreshStateStopped;
+            if(hasCustomView && [customView respondsToSelector:@selector(refreshStateUpdated:)]) {
+                [customView performSelector:@selector(refreshStateUpdated:) withObject:[NSNumber numberWithInt:self.state]];
+            }
+        }
     } else {
         CGFloat offset = MAX(self.scrollView.contentOffset.y * -1, 0.0f);
         offset = MIN(offset, self.originalTopInset + self.bounds.size.height);
