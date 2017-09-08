@@ -70,6 +70,11 @@ static char UIScrollViewPullToRefreshView;
         view.originalTopInset = self.contentInset.top;
         self.pullToRefreshView = view;
         self.showsPullToRefresh = YES;
+        
+        NSOperatingSystemVersion ios11_0_0 = (NSOperatingSystemVersion){11, 0, 0};
+        if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios11_0_0]) {
+            [self setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
+        }
     }
 }
 
