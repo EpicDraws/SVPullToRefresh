@@ -70,11 +70,19 @@ static char UIScrollViewPullToRefreshView;
         view.originalTopInset = self.contentInset.top;
         self.pullToRefreshView = view;
         self.showsPullToRefresh = YES;
-        
-        NSOperatingSystemVersion ios11_0_0 = (NSOperatingSystemVersion){11, 0, 0};
-        if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios11_0_0]) {
-            [self setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
-        }
+    }
+    
+    NSOperatingSystemVersion ios11_0_0 = (NSOperatingSystemVersion){11, 0, 0};
+    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios11_0_0]) {
+        [self setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
+    }
+    
+    int screenHeight = [[UIScreen mainScreen]bounds].size.height;
+    if (screenHeight == 812) {
+        self.contentInset = UIEdgeInsetsMake(25, 0, 0, 0);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self scrollRectToVisible:CGRectMake(0, 20, self.frame.size.width, self.frame.size.height) animated:NO];
+        });
     }
 }
 
