@@ -262,13 +262,26 @@ static char UIScrollViewPullToRefreshView;
 }
 
 - (void)setScrollViewContentInset:(UIEdgeInsets)contentInset {
-    [UIView animateWithDuration:0.3
+    int screenHeight = [[UIScreen mainScreen]bounds].size.height;
+    if (screenHeight == 812) {
+          dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.3
+                              delay:0
+                            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             [_scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];
+                         }
+                         completion:NULL];
+                  });
+    } else {
+        [UIView animateWithDuration:0.3
                           delay:0
                         options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
                      animations:^{
                          self.scrollView.contentInset = contentInset;
                      }
                      completion:NULL];
+    }
 }
 
 #pragma mark - Observing
