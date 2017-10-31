@@ -269,8 +269,8 @@ static char UIScrollViewPullToRefreshView;
                                   delay:0
                                 options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
                              animations:^{
-                                 [_scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];
-                             }
+                                 self.scrollView.contentInset = UIEdgeInsetsMake(25, 0, 0, 0);
+                                 [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];                             }
                              completion:NULL];
         });
     } else {
