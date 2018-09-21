@@ -78,7 +78,7 @@ static char UIScrollViewPullToRefreshView;
     }
     
     int screenHeight = [[UIScreen mainScreen]bounds].size.height;
-    if (screenHeight == 812) {
+    if (screenHeight == 812 || screenHeight == 896) {
         self.contentInset = UIEdgeInsetsMake(25, 0, 0, 0);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self scrollRectToVisible:CGRectMake(0, 20, self.frame.size.width, self.frame.size.height) animated:NO];
