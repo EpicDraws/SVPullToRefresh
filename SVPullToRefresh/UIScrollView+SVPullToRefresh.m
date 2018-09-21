@@ -263,7 +263,7 @@ static char UIScrollViewPullToRefreshView;
 
 - (void)setScrollViewContentInset:(UIEdgeInsets)contentInset {
     int screenHeight = [[UIScreen mainScreen]bounds].size.height;
-    if (screenHeight == 812) {
+    if (screenHeight == 812 || screenHeight == 896) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView animateWithDuration:0.3
                                   delay:0
