@@ -281,25 +281,31 @@ static char UIScrollViewPullToRefreshView;
                                     options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
                                  animations:^{
                                      self.scrollView.contentInset = UIEdgeInsetsMake(25, 0, 0, 0);
-                                     [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];                             }
-                                 completion:NULL];
+                                     [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];
+                    
+                } completion:NULL];
             });
         } else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-            [UIView animateWithDuration:0.3
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIView animateWithDuration:0.3
+                                      delay:0
+                                    options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                                 animations:^{
+                                     self.scrollView.contentInset = UIEdgeInsetsMake(10, 0, 0, 0);
+                                     [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];
+                    
+                } completion:NULL];
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIView animateWithDuration:0.3
                                   delay:0
                                 options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
                              animations:^{
-                                 self.scrollView.contentInset = UIEdgeInsetsMake(10, 0, 0, 0);
-                                 [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];                             }
-                             completion:NULL];
-        } else {
-            [UIView animateWithDuration:0.3
-                              delay:0
-                            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
-                         animations:^{
-                             self.scrollView.contentInset = contentInset;
-                         }
-                         completion:NULL];
+                                 self.scrollView.contentInset = contentInset;
+                             }
+                completion:NULL];
+            });
         }
     }
 }
