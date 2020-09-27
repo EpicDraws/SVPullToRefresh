@@ -72,10 +72,11 @@ static char UIScrollViewPullToRefreshView;
         self.showsPullToRefresh = YES;
     }
     
-    NSOperatingSystemVersion ios11_0_0 = (NSOperatingSystemVersion){11, 0, 0};
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios11_0_0]) {
+
+    if (@available(iOS 11.0, *)) {
         [self setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
     }
+    
     
     int screenHeight = [[UIScreen mainScreen]bounds].size.height;
     if (screenHeight == 812 || screenHeight == 896) {
@@ -219,8 +220,7 @@ static char UIScrollViewPullToRefreshView;
         CGRect viewBounds = [customView bounds];
         CGPoint origin = CGPointMake(roundf((self.bounds.size.width-viewBounds.size.width)/2), roundf((self.bounds.size.height-viewBounds.size.height)/2));
         [customView setFrame:CGRectMake(origin.x, origin.y, viewBounds.size.width, viewBounds.size.height)];
-    }
-    else {
+    } else {
         self.titleLabel.text = [self.titles objectAtIndex:self.state];
         
         NSString *subtitle = [self.subtitles objectAtIndex:self.state];
@@ -249,8 +249,18 @@ static char UIScrollViewPullToRefreshView;
 #pragma mark - Scroll View
 
 - (void)resetScrollViewContentInset {
+    int screenHeight = [[UIScreen mainScreen]bounds].size.height;
     UIEdgeInsets currentInsets = self.scrollView.contentInset;
-    currentInsets.top = self.originalTopInset;
+    if (@available(iOS 11.0, *)) {
+        if (screenHeight == 812 || screenHeight == 896) {
+            currentInsets.top = 25;
+        } else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            currentInsets.top = 10;
+        } else {
+            currentInsets.top = self.originalTopInset;
+        }
+    }
+    
     [self setScrollViewContentInset:currentInsets];
 }
 
@@ -262,25 +272,35 @@ static char UIScrollViewPullToRefreshView;
 }
 
 - (void)setScrollViewContentInset:(UIEdgeInsets)contentInset {
-    int screenHeight = [[UIScreen mainScreen]bounds].size.height;
-    if (screenHeight == 812 || screenHeight == 896) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+    if (@available(iOS 11.0, *)) {
+        int screenHeight = [[UIScreen mainScreen]bounds].size.height;
+        if (screenHeight == 812 || screenHeight == 896) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIView animateWithDuration:0.3
+                                      delay:0
+                                    options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                                 animations:^{
+                                     self.scrollView.contentInset = UIEdgeInsetsMake(25, 0, 0, 0);
+                                     [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];                             }
+                                 completion:NULL];
+            });
+        } else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             [UIView animateWithDuration:0.3
                                   delay:0
                                 options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
                              animations:^{
-                                 self.scrollView.contentInset = UIEdgeInsetsMake(25, 0, 0, 0);
+                                 self.scrollView.contentInset = UIEdgeInsetsMake(10, 0, 0, 0);
                                  [self.scrollView scrollRectToVisible:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) animated:NO];                             }
                              completion:NULL];
-        });
-    } else {
-        [UIView animateWithDuration:0.3
-                          delay:0
-                        options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
-                     animations:^{
-                         self.scrollView.contentInset = contentInset;
-                     }
-                     completion:NULL];
+        } else {
+            [UIView animateWithDuration:0.3
+                              delay:0
+                            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             self.scrollView.contentInset = contentInset;
+                         }
+                         completion:NULL];
+        }
     }
 }
 
